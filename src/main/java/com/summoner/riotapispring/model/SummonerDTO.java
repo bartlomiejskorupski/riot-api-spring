@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Summoner {
+public class SummonerDTO {
     private String accountId;
     private int profileIconId;
     private long revisionDate;
