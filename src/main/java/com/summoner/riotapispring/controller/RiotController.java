@@ -28,7 +28,6 @@ public class RiotController {
             return ResponseEntity.badRequest().build();
         }
         SummonerDTO summoner = riotService.getSummonerByRegionAndName(region, name);
-        System.out.println(summoner);
         if(summoner == null) {
             return ResponseEntity.notFound().build();
         }
