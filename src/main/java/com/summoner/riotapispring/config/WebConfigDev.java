@@ -17,9 +17,6 @@ public class WebConfigDev implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/images/icons/**")
                 .addResourceLocations(resourceLocation + "images/icons/");
-
-        registry.addResourceHandler("/images/champions/**")
-                .addResourceLocations(resourceLocation + "images/champions/");
     }
 
 }
