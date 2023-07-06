@@ -1,6 +1,8 @@
 package com.summoner.riotapispring.controller;
 
+import com.summoner.riotapispring.model.ChampionMasteryDTO;
 import com.summoner.riotapispring.model.SummonerDTO;
+import com.summoner.riotapispring.model.SummonerResponse;
 import com.summoner.riotapispring.service.RiotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +21,8 @@ public class RiotController {
 
     private final List<String> regions = List.of("br1", "eun1", "euw1", "jp1", "kr", "la1", "la2", "na1", "oc1", "tr1", "ru", "ph2", "sg2", "th2", "tw2", "vn2");
 
-    @GetMapping("/api/summoner/{region}/{name}")
-    public ResponseEntity<SummonerDTO> getSummonerByName(
+    @GetMapping("/api/{region}/summoner/{name}")
+    public ResponseEntity<SummonerResponse> getSummonerByName(
         @PathVariable String region,
         @PathVariable String name
     ) {
@@ -31,7 +33,23 @@ public class RiotController {
         if(summoner == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(summoner);
+        SummonerResponse summonerResponse = SummonerResponse.fromDTO(summoner);
+        return ResponseEntity.ok(summonerResponse);
+    }
+
+    @GetMapping("/api/{region}/champion-mastery/{encryptedSummonerId}/top")
+    public ResponseEntity<List<ChampionMasteryDTO>> getChampionMasteryTop3(
+        @PathVariable String region,
+        @PathVariable String encryptedSummonerId
+    ) {
+        if(!regions.contains(region)) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<ChampionMasteryDTO> masteryList = riotService.getChampionMasteryTop(region, encryptedSummonerId, 3);
+        if (masteryList == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(masteryList);
     }
 
 }
