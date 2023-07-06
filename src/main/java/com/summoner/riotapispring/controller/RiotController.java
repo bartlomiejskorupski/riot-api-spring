@@ -1,6 +1,7 @@
 package com.summoner.riotapispring.controller;
 
 import com.summoner.riotapispring.model.ChampionMasteryDTO;
+import com.summoner.riotapispring.model.ChampionMasteryResponse;
 import com.summoner.riotapispring.model.SummonerDTO;
 import com.summoner.riotapispring.model.SummonerResponse;
 import com.summoner.riotapispring.service.RiotService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class RiotController {
@@ -34,6 +36,14 @@ public class RiotController {
             return ResponseEntity.notFound().build();
         }
         SummonerResponse summonerResponse = SummonerResponse.fromDTO(summoner);
+        List<ChampionMasteryDTO> masteryList = riotService.getChampionMasteryTop(region, summoner.getId(), 3);
+        if (masteryList == null) {
+            masteryList = List.of();
+        }
+        List<ChampionMasteryResponse> masteryResponseList = masteryList.stream()
+                .map(ChampionMasteryResponse::fromDTO)
+                .toList();
+        summonerResponse.setChampionMasteries(masteryResponseList);
         return ResponseEntity.ok(summonerResponse);
     }
 
