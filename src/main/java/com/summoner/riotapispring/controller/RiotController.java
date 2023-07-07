@@ -1,50 +1,63 @@
 package com.summoner.riotapispring.controller;
 
 import com.summoner.riotapispring.model.ChampionMasteryDTO;
-import com.summoner.riotapispring.model.ChampionMasteryResponse;
+import com.summoner.riotapispring.model.ChampionMastery;
 import com.summoner.riotapispring.model.SummonerDTO;
-import com.summoner.riotapispring.model.SummonerResponse;
+import com.summoner.riotapispring.model.Summoner;
+import com.summoner.riotapispring.service.ChampionMasteryService;
 import com.summoner.riotapispring.service.RiotService;
+import com.summoner.riotapispring.service.SummonerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @RestController
 public class RiotController {
 
-    @Autowired
-    private RiotService riotService;
-
+    private final RiotService riotService;
+    private final SummonerService summonerService;
+    private final ChampionMasteryService championMasteryService;
     private final List<String> regions = List.of("br1", "eun1", "euw1", "jp1", "kr", "la1", "la2", "na1", "oc1", "tr1", "ru", "ph2", "sg2", "th2", "tw2", "vn2");
 
+    @Autowired
+    RiotController(RiotService riotService, SummonerService summonerService, ChampionMasteryService championMasteryService) {
+        this.riotService = riotService;
+        this.summonerService = summonerService;
+        this.championMasteryService = championMasteryService;
+    }
+
     @GetMapping("/api/{region}/summoner/{name}")
-    public ResponseEntity<SummonerResponse> getSummonerByName(
+    public ResponseEntity<Summoner> getSummonerByName(
         @PathVariable String region,
         @PathVariable String name
     ) {
         if(!regions.contains(region)) {
             return ResponseEntity.badRequest().build();
         }
-        SummonerDTO summoner = riotService.getSummonerByRegionAndName(region, name);
-        if(summoner == null) {
+
+        SummonerDTO summonerDTO = riotService.getSummonerByRegionAndName(region, name);
+        if(summonerDTO == null) {
             return ResponseEntity.notFound().build();
         }
-        SummonerResponse summonerResponse = SummonerResponse.fromDTO(summoner);
-        List<ChampionMasteryDTO> masteryList = riotService.getChampionMasteryTop(region, summoner.getId(), 3);
-        if (masteryList == null) {
-            masteryList = List.of();
-        }
-        List<ChampionMasteryResponse> masteryResponseList = masteryList.stream()
-                .map(ChampionMasteryResponse::fromDTO)
-                .toList();
-        summonerResponse.setChampionMasteries(masteryResponseList);
-        return ResponseEntity.ok(summonerResponse);
+
+        Optional<Summoner> summonerOpt = summonerService.getSummonerByPuuid(summonerDTO.getPuuid());
+        Summoner summoner = summonerOpt.orElse(Summoner.fromDTO(summonerDTO));
+        summoner.updateFromDTO(summonerDTO);
+        summonerService.updateSummoner(summoner);
+//        List<ChampionMasteryDTO> masteryList = riotService.getChampionMasteryTop(region, summoner.getId(), 3);
+//        if (masteryList == null) {
+//            masteryList = List.of();
+//        }
+//        List<ChampionMastery> masteryResponseList = masteryList.stream()
+//                .map(ChampionMastery::fromDTO)
+//                .toList();
+//        summoner.setChampionMasteries(masteryResponseList);
+        return ResponseEntity.ok(summoner);
     }
 
     @GetMapping("/api/{region}/champion-mastery/{encryptedSummonerId}/top")

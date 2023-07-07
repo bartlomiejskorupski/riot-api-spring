@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "summoner")
-public class SummonerResponse {
+public class Summoner {
     @Id
     @Column(name = "puuid", nullable = false)
     private String puuid;
@@ -31,10 +31,10 @@ public class SummonerResponse {
     @Column(name = "profile_icon_path", length = 256)
     private String profileIconPath;
     @OneToMany(mappedBy = "summoner", cascade = CascadeType.ALL)
-    private List<ChampionMasteryResponse> championMasteries;
+    private List<ChampionMastery> championMasteries;
 
-    public static SummonerResponse fromDTO(SummonerDTO summonerDTO) {
-        return SummonerResponse.builder()
+    public static Summoner fromDTO(SummonerDTO summonerDTO) {
+        return Summoner.builder()
                 .accountId(summonerDTO.getAccountId())
                 .profileIconId(summonerDTO.getProfileIconId())
                 .revisionDate(summonerDTO.getRevisionDate())
@@ -45,5 +45,15 @@ public class SummonerResponse {
                 .profileIconPath("/images/icons/" + summonerDTO.getProfileIconId() + ".png")
                 .championMasteries(List.of())
                 .build();
+    }
+
+    public void updateFromDTO(SummonerDTO dto) {
+        this.accountId = dto.getAccountId();
+        this.profileIconId = dto.getProfileIconId();
+        this.revisionDate = dto.getRevisionDate();
+        this.name = dto.getName();
+        this.id = dto.getId();
+        this.summonerLevel = dto.getSummonerLevel();
+        this.profileIconPath = "/images/icons/" + dto.getProfileIconId() + ".png";
     }
 }

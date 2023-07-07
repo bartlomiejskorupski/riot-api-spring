@@ -3,8 +3,6 @@ package com.summoner.riotapispring.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -12,13 +10,13 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name="champion_mastery")
-public class ChampionMasteryResponse {
+public class ChampionMastery {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "summoner_puuid", nullable = false)
-    private SummonerResponse summoner;
+    private Summoner summoner;
     @Column(name = "champion_points_until_next_level")
     private long championPointsUntilNextLevel;
     @Column(name = "chest_granted")
@@ -40,8 +38,8 @@ public class ChampionMasteryResponse {
     @Column(name = "champion_icon_path")
     private String championIconPath;
 
-    public static ChampionMasteryResponse fromDTO(ChampionMasteryDTO masteryDTO) {
-        return ChampionMasteryResponse.builder()
+    public static ChampionMastery fromDTO(ChampionMasteryDTO masteryDTO) {
+        return ChampionMastery.builder()
                 .championPointsUntilNextLevel(masteryDTO.getChampionPointsUntilNextLevel())
                 .chestGranted(masteryDTO.isChestGranted())
                 .lastPlayTime(masteryDTO.getLastPlayTime())
