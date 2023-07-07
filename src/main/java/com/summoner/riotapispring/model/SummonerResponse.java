@@ -1,5 +1,6 @@
 package com.summoner.riotapispring.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
@@ -9,15 +10,27 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@Entity
+@Table(name = "summoner")
 public class SummonerResponse {
-    private String accountId;
-    private int profileIconId;
-    private long revisionDate;
-    private String name;
-    private String id;
+    @Id
+    @Column(name = "puuid", nullable = false)
     private String puuid;
+    @Column(name = "account_id")
+    private String accountId;
+    @Column(name = "profile_icon_id")
+    private int profileIconId;
+    @Column(name = "revision_date")
+    private long revisionDate;
+    @Column(name = "name", length = 50)
+    private String name;
+    @Column(name = "id", nullable = false, length = 63)
+    private String id;
+    @Column(name = "summoner_level")
     private long summonerLevel;
+    @Column(name = "profile_icon_path", length = 256)
     private String profileIconPath;
+    @OneToMany(mappedBy = "summoner", cascade = CascadeType.ALL)
     private List<ChampionMasteryResponse> championMasteries;
 
     public static SummonerResponse fromDTO(SummonerDTO summonerDTO) {
