@@ -8,6 +8,7 @@ import com.summoner.riotapispring.service.ChampionMasteryService;
 import com.summoner.riotapispring.service.RiotService;
 import com.summoner.riotapispring.service.SummonerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,6 +74,18 @@ public class RiotController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(masteryList);
+    }
+
+    @GetMapping("/api/{region}/summoner-name/starts-with")
+    public ResponseEntity<List<String>> getSummonerNamesStartingWith(
+            @PathVariable String region,
+            @Param("startsWith") String startsWith
+    ) {
+        if(!regions.contains(region)) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<String> names = summonerService.getAllNamesStartingWith(startsWith);
+        return ResponseEntity.ok(names);
     }
 
 }
