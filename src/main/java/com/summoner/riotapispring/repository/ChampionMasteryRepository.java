@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface ChampionMasteryRepository extends JpaRepository<ChampionMastery, Integer> {
 
+    public List<ChampionMastery> findAllBySummonerPuuid(String puuid);
+
 }

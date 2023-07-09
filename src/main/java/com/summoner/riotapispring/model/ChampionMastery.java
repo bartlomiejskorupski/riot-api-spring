@@ -1,5 +1,6 @@
 package com.summoner.riotapispring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +17,7 @@ public class ChampionMastery {
     private Integer id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "summoner_puuid", nullable = false)
+    @JsonIgnore
     private Summoner summoner;
     @Column(name = "champion_points_until_next_level")
     private long championPointsUntilNextLevel;
@@ -43,6 +45,7 @@ public class ChampionMastery {
                 .championPointsUntilNextLevel(masteryDTO.getChampionPointsUntilNextLevel())
                 .chestGranted(masteryDTO.isChestGranted())
                 .lastPlayTime(masteryDTO.getLastPlayTime())
+                .championId(masteryDTO.getChampionId())
                 .championLevel(masteryDTO.getChampionLevel())
                 .championPoints(masteryDTO.getChampionPoints())
                 .championPointsSinceLastLevel(masteryDTO.getChampionPointsSinceLastLevel())

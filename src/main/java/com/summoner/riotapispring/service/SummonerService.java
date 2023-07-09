@@ -30,4 +30,5 @@ public class SummonerService {
     public List<String> getAllNamesStartingWith(String startsWith, String region, int top) {
         return repository.getAllNamesStartingWith(startsWith, region, top);
     }
+
 }
