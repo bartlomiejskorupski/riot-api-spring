@@ -27,7 +27,7 @@ public class SummonerService {
         repository.save(summoner);
     }
 
-    public List<String> getAllNamesStartingWith(String startsWith) {
-        return repository.getAllNamesStartingWith(startsWith);
+    public List<String> getAllNamesStartingWith(String startsWith, String region, int top) {
+        return repository.getAllNamesStartingWith(startsWith, region, top);
     }
 }

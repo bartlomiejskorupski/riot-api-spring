@@ -16,6 +16,8 @@ public class Summoner {
     @Id
     @Column(name = "puuid", nullable = false)
     private String puuid;
+    @Column(name = "region")
+    private String region;
     @Column(name = "account_id")
     private String accountId;
     @Column(name = "profile_icon_id")

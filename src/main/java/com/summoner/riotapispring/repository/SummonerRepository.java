@@ -9,7 +9,17 @@ import java.util.List;
 
 public interface SummonerRepository extends JpaRepository<Summoner, String> {
 
-    @Query("SELECT s.name FROM Summoner s WHERE LOWER(REPLACE(s.name, ' ', '')) LIKE CONCAT(LOWER(REPLACE(:startsWith, ' ', '')), '%')")
-    List<String> getAllNamesStartingWith(@Param("startsWith") String startsWith);
+    @Query("""
+        SELECT s.name FROM Summoner s
+            WHERE LOWER(REPLACE(s.name, ' ', '')) LIKE CONCAT(LOWER(REPLACE(:startsWith, ' ', '')), '%')
+                AND s.region = :region
+            ORDER BY s.name ASC
+            LIMIT :top
+    """)
+    List<String> getAllNamesStartingWith(
+            @Param("startsWith") String startsWith,
+            @Param("region") String region,
+            @Param("top") Integer top
+    );
 
 }

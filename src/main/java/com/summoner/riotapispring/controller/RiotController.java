@@ -49,6 +49,7 @@ public class RiotController {
         Optional<Summoner> summonerOpt = summonerService.getSummonerByPuuid(summonerDTO.getPuuid());
         Summoner summoner = summonerOpt.orElse(Summoner.fromDTO(summonerDTO));
         summoner.updateFromDTO(summonerDTO);
+        summoner.setRegion(region);
         summonerService.updateSummoner(summoner);
 //        List<ChampionMasteryDTO> masteryList = riotService.getChampionMasteryTop(region, summoner.getId(), 3);
 //        if (masteryList == null) {
@@ -79,12 +80,14 @@ public class RiotController {
     @GetMapping("/api/{region}/summoner-name/starts-with")
     public ResponseEntity<List<String>> getSummonerNamesStartingWith(
             @PathVariable String region,
-            @Param("startsWith") String startsWith
+            @Param("startsWith") String startsWith,
+            @Param("top") Optional<Integer> top
     ) {
         if(!regions.contains(region)) {
             return ResponseEntity.badRequest().build();
         }
-        List<String> names = summonerService.getAllNamesStartingWith(startsWith);
+        int takeTop = top.orElse(20);
+        List<String> names = summonerService.getAllNamesStartingWith(startsWith, region, takeTop);
         return ResponseEntity.ok(names);
     }
 

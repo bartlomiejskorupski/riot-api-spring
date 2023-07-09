@@ -1,0 +1,1 @@
+ALTER TABLE "summoner" ADD "region" VARCHAR(10);
