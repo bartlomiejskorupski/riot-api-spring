@@ -82,18 +82,20 @@ public class RiotController {
         return ResponseEntity.ok(summoner);
     }
 
-    @GetMapping("/api/{region}/champion-mastery/{encryptedSummonerId}/top")
-    public ResponseEntity<List<ChampionMasteryDTO>> getChampionMasteryTop3(
+    @GetMapping("/api/{region}/champion-mastery/{puuid}")
+    public ResponseEntity<List<ChampionMastery>> getChampionMastery(
         @PathVariable String region,
-        @PathVariable String encryptedSummonerId
+        @PathVariable String puuid
     ) {
         if(riotService.isRegionInvalid(region)) {
             return ResponseEntity.badRequest().build();
         }
-        List<ChampionMasteryDTO> masteryList = riotService.getChampionMasteryTop(region, encryptedSummonerId, 3);
-        if (masteryList == null) {
+        Optional<Summoner> summonerOpt = summonerService.getSummonerByPuuid(puuid);
+        if(summonerOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        Summoner summoner = summonerOpt.get();
+        List<ChampionMastery> masteryList = summoner.getChampionMasteries();
         return ResponseEntity.ok(masteryList);
     }
 

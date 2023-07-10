@@ -1,5 +1,6 @@
 package com.summoner.riotapispring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,6 +33,7 @@ public class Summoner {
     private long summonerLevel;
     @Column(name = "profile_icon_path", length = 256)
     private String profileIconPath;
+    @JsonIgnore
     @OneToMany(mappedBy = "summoner", cascade = CascadeType.ALL)
     private List<ChampionMastery> championMasteries;
 
