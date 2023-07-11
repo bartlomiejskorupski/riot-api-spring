@@ -1,10 +1,9 @@
 package com.summoner.riotapispring.model.leagueentry;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.text.DecimalFormat;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -47,6 +46,20 @@ public class LeagueEntry {
     private String seriesProgress;
     @Column(name = "series_target")
     private Integer seriesTarget;
+
+    @Transient
+    public String getEmblemUrl() {
+        String url = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/";
+        return url + "emblem-" + tier.toLowerCase() + ".png";
+    }
+
+    @Transient
+    public String getWinRatio() {
+        float wr = 100.0f*wins/(wins+losses);
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
+        return df.format(wr) + "%";
+    }
 
     public static LeagueEntry fromDTO(LeagueEntryDTO dto) {
         LeagueEntryBuilder leb = LeagueEntry.builder()
