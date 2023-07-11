@@ -38,7 +38,7 @@ public class RiotService {
             String endpoint = "/lol/summoner/v4/summoners/by-name/" + name;
             ResponseEntity<SummonerDTO> summonerResponse = getRiotEndpoint(region, endpoint, SummonerDTO.class);
             return Optional.ofNullable(summonerResponse.getBody());
-        } catch (HttpClientErrorException ex) {
+        } catch (Exception ex) {
             System.out.println(ex);
             return Optional.empty();
         }
@@ -49,7 +49,7 @@ public class RiotService {
             String endpoint = "/lol/summoner/v4/summoners/by-puuid/" + puuid;
             ResponseEntity<SummonerDTO> summonerResponse = getRiotEndpoint(region, endpoint, SummonerDTO.class);
             return Optional.ofNullable(summonerResponse.getBody());
-        } catch (HttpClientErrorException ex) {
+        } catch (Exception ex) {
             System.out.println(ex);
             return Optional.empty();
         }
@@ -88,11 +88,19 @@ public class RiotService {
         }
     }
 
-    private <T> ResponseEntity<T> getRiotEndpoint(String region, String endpoint, Class<T> clazz) throws RestClientException {
+    private <T> ResponseEntity<T> getRiotEndpoint(String region, String endpoint, Class<T> clazz) throws InterruptedException {
         String baseUrl = String.format(urlFormat, region);
         String queryParams = "?api_key=" + api_key;
         String url = baseUrl + endpoint + queryParams;
-        return restTemplate.getForEntity(url, clazz);
+        while(true) {
+            try {
+                return restTemplate.getForEntity(url, clazz);
+            } catch(HttpClientErrorException.TooManyRequests ex) {
+                System.out.println(ex);
+                System.out.println("Too many requests! Waiting 0.5s");
+                Thread.sleep(500);
+            }
+        }
     }
 
     public boolean isRegionInvalid(String region) {
