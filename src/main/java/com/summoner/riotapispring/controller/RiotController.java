@@ -118,6 +118,22 @@ public class RiotController {
         return ResponseEntity.ok(masteryList);
     }
 
+    @GetMapping("/api/{region}/league-entry/{puuid}")
+    public ResponseEntity<List<LeagueEntry>> getLeagueEntries(
+            @PathVariable String region,
+            @PathVariable String puuid
+    ) {
+        if(riotService.isRegionInvalid(region)) {
+            return ResponseEntity.badRequest().build();
+        }
+        Optional<Summoner> summonerOpt = summonerService.getSummonerByPuuid(puuid);
+        if(summonerOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<LeagueEntry> leagueEntries = leagueEntryService.getBySummonerPuuid(puuid);
+        return ResponseEntity.ok(leagueEntries);
+    }
+
     @GetMapping("/api/{region}/summoner-name/starts-with")
     public ResponseEntity<List<String>> getSummonerNamesStartingWith(
             @PathVariable String region,
