@@ -1,9 +1,7 @@
 package com.summoner.riotapispring.controller;
 
-import com.summoner.riotapispring.model.ChampionMasteryDTO;
-import com.summoner.riotapispring.model.ChampionMastery;
-import com.summoner.riotapispring.model.SummonerDTO;
-import com.summoner.riotapispring.model.Summoner;
+import com.summoner.riotapispring.component.ChampionDataLoader;
+import com.summoner.riotapispring.model.*;
 import com.summoner.riotapispring.model.leagueentry.LeagueEntry;
 import com.summoner.riotapispring.model.leagueentry.LeagueEntryDTO;
 import com.summoner.riotapispring.service.ChampionMasteryService;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -26,18 +25,21 @@ public class RiotController {
     private final SummonerService summonerService;
     private final ChampionMasteryService championMasteryService;
     private final LeagueEntryService leagueEntryService;
+    private final ChampionDataLoader championDataLoader;
 
     @Autowired
     RiotController(
             RiotService riotService,
             SummonerService summonerService,
             ChampionMasteryService championMasteryService,
-            LeagueEntryService leagueEntryService
+            LeagueEntryService leagueEntryService,
+            ChampionDataLoader championDataLoader
     ) {
         this.riotService = riotService;
         this.summonerService = summonerService;
         this.championMasteryService = championMasteryService;
         this.leagueEntryService = leagueEntryService;
+        this.championDataLoader = championDataLoader;
     }
 
     @GetMapping("/api/{region}/summoner/{name}")
@@ -115,6 +117,12 @@ public class RiotController {
         }
         Summoner summoner = summonerOpt.get();
         List<ChampionMastery> masteryList = summoner.getChampionMasteries();
+        masteryList.forEach(m -> {
+            Map<Integer, ChampionData> championDataMap = championDataLoader.getChampionData();
+            ChampionData data = championDataMap.get((int)m.getChampionId());
+            data = data != null ? data : championDataMap.get(-1);
+            m.setChampionData(data);
+        });
         return ResponseEntity.ok(masteryList);
     }
 

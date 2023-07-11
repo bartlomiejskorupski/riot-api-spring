@@ -40,6 +40,9 @@ public class ChampionMastery {
     @Column(name = "champion_icon_path")
     private String championIconPath;
 
+    @Transient
+    private ChampionData championData;
+
     public static ChampionMastery fromDTO(ChampionMasteryDTO masteryDTO) {
         return ChampionMastery.builder()
                 .championPointsUntilNextLevel(masteryDTO.getChampionPointsUntilNextLevel())
