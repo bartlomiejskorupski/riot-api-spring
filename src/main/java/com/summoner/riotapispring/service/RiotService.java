@@ -2,6 +2,7 @@ package com.summoner.riotapispring.service;
 
 import com.summoner.riotapispring.model.ChampionMasteryDTO;
 import com.summoner.riotapispring.model.SummonerDTO;
+import com.summoner.riotapispring.model.leagueentry.LeagueEntryDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -70,6 +71,17 @@ public class RiotService {
             String endpoint = "/lol/champion-mastery/v4/champion-masteries/by-summoner/" + encryptedSummonerId;
             ResponseEntity<ChampionMasteryDTO[]> masteryResponse = getRiotEndpoint(region, endpoint, ChampionMasteryDTO[].class);
             return List.of(Objects.requireNonNull(masteryResponse.getBody()));
+        } catch (Exception ex) {
+            System.out.println(ex);
+            return List.of();
+        }
+    }
+
+    public List<LeagueEntryDTO> getLeagueEtries(String region, String encryptedSummonerId) {
+        try {
+            String endpoint = "/lol/league/v4/entries/by-summoner/" + encryptedSummonerId;
+            ResponseEntity<LeagueEntryDTO[]> response = getRiotEndpoint(region, endpoint, LeagueEntryDTO[].class);
+            return List.of(Objects.requireNonNull(response.getBody()));
         } catch (Exception ex) {
             System.out.println(ex);
             return List.of();

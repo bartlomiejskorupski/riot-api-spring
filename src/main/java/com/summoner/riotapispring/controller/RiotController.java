@@ -4,7 +4,10 @@ import com.summoner.riotapispring.model.ChampionMasteryDTO;
 import com.summoner.riotapispring.model.ChampionMastery;
 import com.summoner.riotapispring.model.SummonerDTO;
 import com.summoner.riotapispring.model.Summoner;
+import com.summoner.riotapispring.model.leagueentry.LeagueEntry;
+import com.summoner.riotapispring.model.leagueentry.LeagueEntryDTO;
 import com.summoner.riotapispring.service.ChampionMasteryService;
+import com.summoner.riotapispring.service.LeagueEntryService;
 import com.summoner.riotapispring.service.RiotService;
 import com.summoner.riotapispring.service.SummonerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +25,19 @@ public class RiotController {
     private final RiotService riotService;
     private final SummonerService summonerService;
     private final ChampionMasteryService championMasteryService;
+    private final LeagueEntryService leagueEntryService;
 
     @Autowired
-    RiotController(RiotService riotService, SummonerService summonerService, ChampionMasteryService championMasteryService) {
+    RiotController(
+            RiotService riotService,
+            SummonerService summonerService,
+            ChampionMasteryService championMasteryService,
+            LeagueEntryService leagueEntryService
+    ) {
         this.riotService = riotService;
         this.summonerService = summonerService;
         this.championMasteryService = championMasteryService;
+        this.leagueEntryService = leagueEntryService;
     }
 
     @GetMapping("/api/{region}/summoner/{name}")
@@ -72,11 +82,20 @@ public class RiotController {
         Summoner summoner = summonerOpt.get();
         summoner.updateFromDTO(summonerDTO);
 
+        // Update mastery
         List<ChampionMasteryDTO> masteryDTOList = riotService.getChampionMastery(region, summoner.getId());
         ArrayList<ChampionMastery> masteryList = new ArrayList<>(masteryDTOList.stream().map(ChampionMastery::fromDTO).toList());
         masteryList.forEach(mastery -> mastery.setSummoner(summoner));
         championMasteryService.deleteMasteriesBySummonerPuuid(puuid);
         summoner.setChampionMasteries(masteryList);
+
+        // Update league entries
+        List<LeagueEntryDTO> leagueEntryDTOList = riotService.getLeagueEtries(region, summoner.getId());
+        List<LeagueEntry> leagueEntries = leagueEntryDTOList.stream().map(LeagueEntry::fromDTO).toList();
+        leagueEntries.forEach(le -> {
+            le.setSummonerPuuid(summoner.getPuuid());
+            leagueEntryService.save(le);
+        });
 
         summonerService.updateSummoner(summoner);
         return ResponseEntity.ok(summoner);
